@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Initialize database and run FastAPI app with hot-reloading
-CMD ["bash", "-c", "python app/init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+CMD ["bash", "-c", "python init_db.py && python main.py"]

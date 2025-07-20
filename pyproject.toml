@@ -10,6 +10,7 @@ dependencies = [
     "fastapi>=0.116.1",
     "githubkit>=0.12.15",
     "httpx>=0.28.1",
+    "itsdangerous>=2.2.0",
     "passlib[bcrypt]>=1.7.4",
     "prometheus-client>=0.22.1",
     "psycopg2>=2.9.10",
