@@ -27,8 +27,6 @@ import datetime
 
 router = APIRouter()
 
-# --- Pydantic Models ---
-
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -57,7 +55,7 @@ class LoginSuccessResponse(BaseModel):
 class UserSignup(BaseModel):
     full_name: Optional[str] = None
     email: EmailStr
-    password: str = Field(..., min_length=8)  # Enforce minimum password length
+    password: str = Field(..., min_length=8)
     retype_password: str
 
     @validator("retype_password")
@@ -182,7 +180,8 @@ async def login_github():
         f"scope=user,repo&"
         f"state={settings.APP_SECRET_KEY}"
     )
-    return RedirectResponse(url=github_auth_url)
+    # return RedirectResponse(url=github_auth_url)
+    return github_auth_url
 
 
 @router.get("/oauth/github/callback", response_model=LoginSuccessResponse)
