@@ -4,8 +4,20 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { auth } from "@/lib/server/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import dayjs from "dayjs";
 
-export default function SidebarLayout({ children }: { children: React.ReactNode }) {
+export default async function SidebarLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const isExpired = dayjs(session?.session.expiresAt).isBefore(dayjs());
+  if (!session || dayjs(session.session.expiresAt).isBefore(dayjs())) {
+    redirect("/login");
+  }
+
   return (
     <SidebarProvider
       style={

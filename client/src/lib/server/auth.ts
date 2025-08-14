@@ -8,7 +8,7 @@ export const auth = betterAuth({
     account: {
         accountLinking: {
             enabled: true,
-        }
+        },
     },
     emailAndPassword: {
         enabled: true,
@@ -16,7 +16,9 @@ export const auth = betterAuth({
     socialProviders: {
         github: {
             clientId: config.GITHUB_CLIENT_ID!,
-            clientSecret: config.GITHUB_CLIENT_SECRET!
+            clientSecret: config.GITHUB_CLIENT_SECRET!,
+            scope: ["read:user", "user:email", "repo:status", "re   ad:repo_hook", "write:repo_hook", "events"],
+            redirectURI: `http://localhost:3000/api/auth/callback/github`,
         },
     },
     plugins: [nextCookies()]

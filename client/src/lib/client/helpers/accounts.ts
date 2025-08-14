@@ -9,14 +9,15 @@ export const listUserAccountsWithProfile = async () => {
     const profiles = await Promise.all(
         accounts.map(async (acc) => {
             try {
-                const profile =
-                    await authClient.accountInfo({
-                        accountId: acc.accountId,
-
-                    });
+                const profileResponse = await authClient.accountInfo({
+                    accountId: acc.accountId,
+                });
                 return {
                     ...acc,
-                    profile: profile.data,
+                    profile: {
+                        user: profileResponse.data?.user,
+                        data: profileResponse.data?.data,
+                    },
                 };
             } catch (err) {
                 return {
@@ -41,9 +42,11 @@ export const linkSocialAccount = async (provider: string) => {
 
 export const unlinkSocialAccount = async (provider: string) => {
     try {
+        console.log(provider)
         const response = await authClient.unlinkAccount({ providerId: provider });
         return response.data;
     } catch (error) {
+        console.log(error)
         throw new Error("Failed to link social account: " + (error as Error).message);
     }
 }
