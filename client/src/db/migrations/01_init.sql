@@ -310,9 +310,7 @@ CREATE TRIGGER trg_session_updatedAt BEFORE UPDATE ON "session" FOR EACH ROW EXE
 CREATE TRIGGER trg_verification_updatedAt BEFORE UPDATE ON "verification" FOR EACH ROW EXECUTE FUNCTION update_updatedAt_column();
 CREATE TRIGGER trg_repo_webhook_updatedAt BEFORE UPDATE ON "repo_webhook" FOR EACH ROW EXECUTE FUNCTION update_updatedAt_column();
 
--- =====================
--- POLLING STATE: Recalculation Function (fixed case-sensitive references)
--- =====================
+
 CREATE OR REPLACE FUNCTION recalc_user_polling_state(p_user_id TEXT)
 RETURNS VOID AS $$
 DECLARE
@@ -326,30 +324,34 @@ BEGIN
 
     IF last_seen IS NULL THEN
         new_priority := 3;
-        new_interval := interval '6 hours';
+        new_interval := interval '12 hours';
     ELSE
         IF last_seen >= NOW() - interval '12 hours' THEN
             new_priority := 1;
-            new_interval := interval '1 hour';
+            new_interval := interval '10 seconds';    
         ELSIF last_seen >= NOW() - interval '72 hours' THEN
             new_priority := 2;
-            new_interval := interval '3 hours';
+            new_interval := interval '6 hours';       
         ELSE
             new_priority := 3;
-            new_interval := interval '6 hours';
+            new_interval := interval '12 hours';      
         END IF;
     END IF;
 
-    INSERT INTO "user_polling_state" ("userId", "polling_interval", "next_scheduled_at", "priority", "source", "updatedAt")
-    VALUES (p_user_id, new_interval, NOW() + new_interval, new_priority, 'login', NOW())
+    INSERT INTO "user_polling_state"
+        ("userId", "polling_interval", "next_scheduled_at", "priority", "source", "updatedAt")
+    VALUES
+        (p_user_id, new_interval, NOW() + new_interval, new_priority, 'login', NOW())
     ON CONFLICT ("userId") DO UPDATE
-    SET "polling_interval" = EXCLUDED."polling_interval",
+    SET
+        "polling_interval" = EXCLUDED."polling_interval",
         "next_scheduled_at" = NOW() + EXCLUDED."polling_interval",
         "priority" = EXCLUDED."priority",
         "source" = EXCLUDED."source",
         "updatedAt" = NOW();
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- =====================
 -- Trigger: On session insert/update -> Recalc polling

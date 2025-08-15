@@ -20,6 +20,8 @@ export async function startCrons() {
     //     for (const u of users) await pollUserHybrid(u);
     // });
     const users1 = await getUsersByPriority(1);
+    for (const u of users1) await pollUserHybrid(u);
+
     const users2 = await getUsersByPriority(2);
     const users3 = await getUsersByPriority(3);
     console.log(users1, users2, users3);

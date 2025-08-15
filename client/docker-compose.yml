@@ -12,5 +12,14 @@ services:
     volumes:
       - timescale-data:/var/lib/postgresql/data
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"      # RabbitMQ main communication port
+      - "15672:15672"    # RabbitMQ management UI
+
 volumes:
   timescale-data:
